@@ -24,7 +24,6 @@
 //     });
 // });
 
-
 $(document).ready(function () {
 
     $("#registerForm").submit(function (e) {
@@ -33,7 +32,7 @@ $(document).ready(function () {
 
         $.ajax({
 
-            url: "assets/php/register.php",
+            url: "php/register.php",
 
             type: "POST",
 
@@ -65,9 +64,9 @@ $(document).ready(function () {
 
             error: function (xhr, status, error) {
 
-                console.log(error);
+                console.log(xhr.responseText);
 
-                alert("Something went wrong");
+                alert("Request Failed");
 
             }
 
