@@ -26,16 +26,15 @@ $redis = new Predis\Client();
 
 <?php
 
-$host = getenv("DB_HOST");
-$user = getenv("DB_USER");
-$pass = getenv("DB_PASS");
-$db   = getenv("DB_NAME");
-$port = getenv("DB_PORT");
+$host = "YOUR_MYSQL_HOST";
+$user = "YOUR_MYSQL_USER";
+$password = "YOUR_MYSQL_PASSWORD";
+$database = "YOUR_MYSQL_DATABASE";
 
-$conn = new mysqli($host, $user, $pass, $db, $port);
+$conn = new mysqli($host, $user, $password, $database);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if($conn->connect_error){
+    die("Connection failed");
 }
 
 ?>

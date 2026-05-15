@@ -1,29 +1,44 @@
-$(document).ready(function () {
+$(document).ready(function(){
 
-    $('#loginBtn').click(function () {
+    $("#loginForm").submit(function(e){
+
+        e.preventDefault();
 
         $.ajax({
-            url: 'https://internship-auth-project.onrender.com/php/login.php',
-            type: 'POST',
+
+            url: "assets/php/login.php",
+
+            type: "POST",
+
             data: {
-                email: $('#email').val(),
-                password: $('#password').val()
+
+                email: $("#email").val(),
+
+                password: $("#password").val()
+
             },
-            success: function (response) {
+
+            success: function(response){
 
                 let data = JSON.parse(response);
 
-                if (data.status) {
+                alert(data.message);
 
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user_id', data.user_id);
+                if(data.status === "success"){
 
-                    window.location.href = 'https://internship-auth-project.onrender.com/profile.html';
+                    localStorage.setItem(
+                        "user_email",
+                        $("#email").val()
+                    );
 
-                } else {
-                    alert(data.message);
+                    window.location.href = "profile.html";
+
                 }
+
             }
+
         });
+
     });
+
 });

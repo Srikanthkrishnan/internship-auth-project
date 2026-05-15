@@ -1,23 +1,63 @@
-<?php
+<!-- <?php
 
 include 'config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$name = $_POST['name'];
+$email = $_POST['email'];
+$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-$name = $data['name'];
-$email = $data['email'];
-$password = password_hash($data['password'], PASSWORD_DEFAULT);
-
-$sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-
-$stmt = $conn->prepare($sql);
+$stmt = $mysql->prepare(
+    "INSERT INTO users(name, email, password) VALUES (?, ?, ?)"
+);
 
 $stmt->bind_param("sss", $name, $email, $password);
 
 if ($stmt->execute()) {
-    echo "Registration successful";
+    echo json_encode([
+        "status" => true,
+        "message" => "Registration successful"
+    ]);
 } else {
-    echo "Error: " . $stmt->error;
+    echo json_encode([
+        "status" => false,
+        "message" => "Email already exists"
+    ]);
+}
+
+?> -->
+
+
+
+
+<?php
+
+include 'config.php';
+
+$name = $_POST['name'];
+$email = $_POST['email'];
+
+$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+$stmt = $conn->prepare(
+"INSERT INTO users(name,email,password) VALUES(?,?,?)"
+);
+
+$stmt->bind_param("sss",$name,$email,$password);
+
+if($stmt->execute()){
+
+    echo json_encode([
+        "status"=>"success",
+        "message"=>"Registration Successful"
+    ]);
+
+}else{
+
+    echo json_encode([
+        "status"=>"error",
+        "message"=>"Registration Failed"
+    ]);
+
 }
 
 ?>
