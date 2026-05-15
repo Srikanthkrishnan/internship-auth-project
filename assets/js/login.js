@@ -3,7 +3,7 @@ $(document).ready(function () {
     $('#loginBtn').click(function () {
 
         $.ajax({
-            url: 'php/login.php',
+            url: 'https://internship-auth-project.onrender.com/php/login.php',
             type: 'POST',
             data: {
                 email: $('#email').val(),
@@ -18,7 +18,7 @@ $(document).ready(function () {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user_id', data.user_id);
 
-                    window.location.href = 'profile.html';
+                    window.location.href = 'https://internship-auth-project.onrender.com/profile.html';
 
                 } else {
                     alert(data.message);

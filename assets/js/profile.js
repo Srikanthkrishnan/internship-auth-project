@@ -9,7 +9,7 @@ $(document).ready(function () {
     $('#saveProfileBtn').click(function () {
 
         $.ajax({
-            url: 'php/profile.php',
+            url: 'https://internship-auth-project.onrender.com/php/profile.php',
             type: 'POST',
             data: {
                 user_id: user_id,
@@ -28,7 +28,7 @@ $(document).ready(function () {
     $('#logoutBtn').click(function () {
 
         $.ajax({
-            url: 'php/logout.php',
+            url: 'https://internship-auth-project.onrender.com/php/logout.php',
             type: 'POST',
             data: {
                 token: localStorage.getItem('token')
@@ -36,7 +36,7 @@ $(document).ready(function () {
             success: function () {
 
                 localStorage.clear();
-                window.location.href = 'login.html';
+                window.location.href = 'https://internship-auth-project.onrender.com/login.html';
             }
         });
     });
