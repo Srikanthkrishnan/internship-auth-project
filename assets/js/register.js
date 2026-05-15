@@ -25,10 +25,9 @@
 // });
 
 
+$(document).ready(function () {
 
-$(document).ready(function(){
-
-    $("#registerForm").submit(function(e){
+    $("#registerForm").submit(function (e) {
 
         e.preventDefault();
 
@@ -48,17 +47,27 @@ $(document).ready(function(){
 
             },
 
-            success: function(response){
+            success: function (response) {
+
+                console.log(response);
 
                 let data = JSON.parse(response);
 
                 alert(data.message);
 
-                if(data.status === "success"){
+                if (data.status === "success") {
 
                     window.location.href = "login.html";
 
                 }
+
+            },
+
+            error: function (xhr, status, error) {
+
+                console.log(error);
+
+                alert("Something went wrong");
 
             }
 
