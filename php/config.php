@@ -26,29 +26,16 @@ $redis = new Predis\Client();
 
 <?php
 
-require '../vendor/autoload.php';
+$host = getenv("DB_HOST");
+$user = getenv("DB_USER");
+$pass = getenv("DB_PASS");
+$db   = getenv("DB_NAME");
+$port = getenv("DB_PORT");
 
-// MYSQL
-$mysql = new mysqli(
-    getenv('MYSQL_HOST'),
-    getenv('MYSQL_USER'),
-    getenv('MYSQL_PASSWORD'),
-    getenv('MYSQL_DATABASE')
-);
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
-// MongoDB
-$mongoClient = new MongoDB\Client(
-    getenv('MONGO_URI')
-);
-
-$mongoDB = $mongoClient->internship_profile;
-
-// Redis
-$redis = new Predis\Client([
-    'scheme' => 'tcp',
-    'host'   => getenv('REDIS_HOST'),
-    'port'   => getenv('REDIS_PORT'),
-    'password' => getenv('REDIS_PASSWORD')
-]);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 ?>
