@@ -21,7 +21,6 @@ $mongoDB = $mongoClient->internship_profile;
 $redis = new Predis\Client();
 
 ?> -->
-
 <?php
 
 $host = getenv("MYSQLHOST");
@@ -33,7 +32,11 @@ $port = getenv("MYSQLPORT");
 $conn = new mysqli($host, $user, $password, $database, $port);
 
 if ($conn->connect_error) {
-    die("Database Connection Failed: " . $conn->connect_error);
+
+    die(json_encode([
+        "status" => "error",
+        "message" => $conn->connect_error
+    ]));
 }
 
 ?>
