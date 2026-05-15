@@ -1,124 +1,42 @@
-<!-- <?php
-
-include 'config.php';
-
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-$stmt = $mysql->prepare(
-    "INSERT INTO users(name, email, password) VALUES (?, ?, ?)"
-);
-
-$stmt->bind_param("sss", $name, $email, $password);
-
-if ($stmt->execute()) {
-    echo json_encode([
-        "status" => true,
-        "message" => "Registration successful"
-    ]);
-} else {
-    echo json_encode([
-        "status" => false,
-        "message" => "Email already exists"
-    ]);
-}
-
-?> -->
-
-
 <?php
 
 header("Content-Type: application/json");
 
-include 'config.php';
+include "config.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$name = $_POST['name'] ?? '';
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
 
-    $name = trim($_POST['name']);
+if (!$name || !$email || !$password) {
 
-    $email = trim($_POST['email']);
+    echo json_encode([
+        "status" => "error",
+        "message" => "All fields required"
+    ]);
 
-    $password = password_hash(
-        $_POST['password'],
-        PASSWORD_DEFAULT
-    );
+    exit;
+}
 
-    $check = $conn->prepare(
-        "SELECT id FROM users WHERE email=?"
-    );
+$hashed = password_hash($password, PASSWORD_DEFAULT);
 
-    $check->bind_param("s", $email);
+$stmt = $conn->prepare(
+    "INSERT INTO users(name,email,password) VALUES(?,?,?)"
+);
 
-    $check->execute();
+$stmt->bind_param("sss", $name, $email, $hashed);
 
-    $result = $check->get_result();
+if ($stmt->execute()) {
 
-    if ($result->num_rows > 0) {
-
-        echo json_encode([
-
-            "status" => "error",
-
-            "message" => "Email already exists"
-
-        ]);
-
-        exit();
-
-    }
-
-    $stmt = $conn->prepare(
-
-        "INSERT INTO users(name,email,password)
-         VALUES(?,?,?)"
-
-    );
-
-    $stmt->bind_param(
-
-        "sss",
-
-        $name,
-
-        $email,
-
-        $password
-
-    );
-
-    if ($stmt->execute()) {
-
-        echo json_encode([
-
-            "status" => "success",
-
-            "message" => "Registration Successful"
-
-        ]);
-
-    } else {
-
-        echo json_encode([
-
-            "status" => "error",
-
-            "message" => "Registration Failed"
-
-        ]);
-
-    }
+    echo json_encode([
+        "status" => "success",
+        "message" => "Registered Successfully"
+    ]);
 
 } else {
 
     echo json_encode([
-
         "status" => "error",
-
-        "message" => "Invalid Request"
-
+        "message" => "Registration Failed"
     ]);
-
 }
-
-?>
