@@ -2,26 +2,22 @@
 
 include 'config.php';
 
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+$data = json_decode(file_get_contents("php://input"), true);
 
-$stmt = $mysql->prepare(
-    "INSERT INTO users(name, email, password) VALUES (?, ?, ?)"
-);
+$name = $data['name'];
+$email = $data['email'];
+$password = password_hash($data['password'], PASSWORD_DEFAULT);
+
+$sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+
+$stmt = $conn->prepare($sql);
 
 $stmt->bind_param("sss", $name, $email, $password);
 
 if ($stmt->execute()) {
-    echo json_encode([
-        "status" => true,
-        "message" => "Registration successful"
-    ]);
+    echo "Registration successful";
 } else {
-    echo json_encode([
-        "status" => false,
-        "message" => "Email already exists"
-    ]);
+    echo "Error: " . $stmt->error;
 }
 
 ?>
