@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 
 require '../vendor/autoload.php';
 
@@ -19,5 +19,36 @@ $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
 $mongoDB = $mongoClient->internship_profile;
 
 $redis = new Predis\Client();
+
+?> -->
+
+
+
+<?php
+
+require '../vendor/autoload.php';
+
+// MYSQL
+$mysql = new mysqli(
+    getenv('MYSQL_HOST'),
+    getenv('MYSQL_USER'),
+    getenv('MYSQL_PASSWORD'),
+    getenv('MYSQL_DATABASE')
+);
+
+// MongoDB
+$mongoClient = new MongoDB\Client(
+    getenv('MONGO_URI')
+);
+
+$mongoDB = $mongoClient->internship_profile;
+
+// Redis
+$redis = new Predis\Client([
+    'scheme' => 'tcp',
+    'host'   => getenv('REDIS_HOST'),
+    'port'   => getenv('REDIS_PORT'),
+    'password' => getenv('REDIS_PASSWORD')
+]);
 
 ?>
