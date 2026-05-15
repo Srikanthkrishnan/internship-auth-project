@@ -1,10 +1,10 @@
 <?php
 
-$host = getenv("MYSQLHOST");
-$user = getenv("MYSQLUSER");
-$password = getenv("MYSQLPASSWORD");
-$database = getenv("MYSQLDATABASE");
-$port = (int)getenv("MYSQLPORT");
+$host = getenv("DB_HOST");
+$user = getenv("DB_USER");
+$password = getenv("DB_PASS");
+$database = getenv("DB_NAME");
+$port = (int)getenv("DB_PORT");
 
 $conn = new mysqli(
     $host,
@@ -15,12 +15,10 @@ $conn = new mysqli(
 );
 
 if ($conn->connect_error) {
-
     echo json_encode([
         "status" => "error",
         "message" => $conn->connect_error
     ]);
-
     exit;
 }
 
