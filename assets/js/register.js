@@ -24,6 +24,8 @@
 //     });
 // });
 
+
+
 $(document).ready(function () {
 
     $("#registerForm").submit(function (e) {
@@ -37,13 +39,9 @@ $(document).ready(function () {
             type: "POST",
 
             data: {
-
                 name: $("#name").val(),
-
                 email: $("#email").val(),
-
                 password: $("#password").val()
-
             },
 
             success: function (response) {
@@ -55,19 +53,13 @@ $(document).ready(function () {
                 alert(data.message);
 
                 if (data.status === "success") {
-
                     window.location.href = "login.html";
-
                 }
-
             },
 
-            error: function (xhr, status, error) {
-
+            error: function (xhr) {
                 console.log(xhr.responseText);
-
-                alert("Request Failed");
-
+                alert("Something went wrong");
             }
 
         });
