@@ -23,6 +23,6 @@ COPY . /var/www/html/
 WORKDIR /var/www/html
 
 # Install composer packages
-RUN composer install
+RUN composer install --ignore-platform-req=ext-mongodb
 
 EXPOSE 80
