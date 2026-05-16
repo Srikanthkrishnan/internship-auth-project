@@ -1,16 +1,28 @@
 <?php
 
-// MYSQL DATABASE (Railway)
-$host = "mysql.railway.internal";
-$user = "root";
-$password = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
-$database = "railway";
-$port = 3306;
+require __DIR__ . '/../vendor/autoload.php';
 
-// MySQL Connection
-$conn = new mysqli($host, $user, $password, $database, $port);
+use MongoDB\Client;
+use Predis\Client as PredisClient;
 
-// Check connection
+/* =========================
+   MYSQL CONNECTION
+========================= */
+
+$mysql_host = "yamanote.proxy.rlwy.net";
+$mysql_port = 13373;
+$mysql_db   = "railway";
+$mysql_user = "root";
+$mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
+
+$conn = new mysqli(
+    $mysql_host,
+    $mysql_user,
+    $mysql_pass,
+    $mysql_db,
+    $mysql_port
+);
+
 if ($conn->connect_error) {
     die(json_encode([
         "status" => "error",
@@ -18,22 +30,49 @@ if ($conn->connect_error) {
     ]));
 }
 
-// MongoDB
-require '../vendor/autoload.php';
+/* =========================
+   MONGODB CONNECTION
+========================= */
 
-$mongoClient = new MongoDB\Client(
-    "mongodb+srv://ks8283311_db_user:Srikanth123@cluster0.5600sbj.mongodb.net/internship_profile?retryWrites=true&w=majority&appName=Cluster0"
-);
+$mongo_uri = "mongodb+srv://ks8283311_db_user:Srikanth123@cluster0.5600sbj.mongodb.net/internship_profile?retryWrites=true&w=majority&appName=Cluster0";
 
-$mongoDB = $mongoClient->internship_profile;
-$profilesCollection = $mongoDB->profiles;
+try {
 
-// Redis (Upstash)
-$redis = new Predis\Client([
-    'scheme' => 'tls',
-    'host'   => 'model-satyr-125165.upstash.io',
-    'port'   => 6379,
-    'password' => 'gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ'
-]);
+    $mongoClient = new Client($mongo_uri);
+
+    $mongoDB = $mongoClient->internship_profile;
+
+} catch (Exception $e) {
+
+    die(json_encode([
+        "status" => "error",
+        "message" => "MongoDB Connection Failed: " . $e->getMessage()
+    ]));
+}
+
+/* =========================
+   REDIS CONNECTION
+========================= */
+
+try {
+
+    $redis = new PredisClient([
+        'scheme' => 'tls',
+        'host'   => 'model-satyr-125165.upstash.io',
+        'port'   => 6379,
+        'password' => 'gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ'
+    ]);
+
+    $redis->ping();
+
+} catch (Exception $e) {
+
+    die(json_encode([
+        "status" => "error",
+        "message" => "Redis Connection Failed: " . $e->getMessage()
+    ]));
+}
 
 ?>
+
+
