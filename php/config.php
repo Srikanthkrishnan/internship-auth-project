@@ -11,7 +11,7 @@ use Predis\Client as PredisClient;
 
 $mysql_host = "yamanote.proxy.rlwy.net";
 $mysql_port = 13373;
-$mysql_db   = "internship_auth";
+$mysql_db   = "railway";
 $mysql_user = "root";
 $mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
 
