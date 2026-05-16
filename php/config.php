@@ -1,127 +1,39 @@
-
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+// MYSQL DATABASE (Railway)
+$host = "mysql.railway.internal";
+$user = "root";
+$password = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
+$database = "railway";
+$port = 3306;
 
-use MongoDB\Client as MongoClient;
-use Predis\Client as RedisClient;
+// MySQL Connection
+$conn = new mysqli($host, $user, $password, $database, $port);
 
-/*
-|--------------------------------------------------------------------------
-| MYSQL DATABASE CONNECTION (RAILWAY)
-|--------------------------------------------------------------------------
-*/
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode([
+        "status" => "error",
+        "message" => "MySQL Connection Failed: " . $conn->connect_error
+    ]));
+}
 
-$mysql_host = "mysql.railway.internal";
+// MongoDB
+require '../vendor/autoload.php';
 
-$mysql_user = "root";
-
-$mysql_password = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
-
-$mysql_database = "railway";
-
-$mysql_port = 3306;
-
-$mysql = new mysqli(
-
-    $mysql_host,
-    $mysql_user,
-    $mysql_password,
-    $mysql_database,
-    $mysql_port
-
+$mongoClient = new MongoDB\Client(
+    "mongodb+srv://ks8283311_db_user:Srikanth123@cluster0.5600sbj.mongodb.net/internship_profile?retryWrites=true&w=majority&appName=Cluster0"
 );
 
-if ($mysql->connect_error) {
+$mongoDB = $mongoClient->internship_profile;
+$profilesCollection = $mongoDB->profiles;
 
-    die(
-
-        json_encode([
-
-            "status"  => "error",
-
-            "message" => "MySQL Connection Failed : " . $mysql->connect_error
-
-        ])
-
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| MONGODB ATLAS CONNECTION
-|--------------------------------------------------------------------------
-*/
-
-try {
-
-    $mongoClient = new MongoClient(
-
-        "mongodb+srv://ks8283311_db_user:Srikanth123@cluster0.5600sbj.mongodb.net/internship_profile?retryWrites=true&w=majority&appName=Cluster0"
-
-    );
-
-    $mongoDB = $mongoClient->internship_profile;
-
-} catch (Exception $e) {
-
-    die(
-
-        json_encode([
-
-            "status"  => "error",
-
-            "message" => "MongoDB Connection Failed : " . $e->getMessage()
-
-        ])
-
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| REDIS (UPSTASH) CONNECTION
-|--------------------------------------------------------------------------
-*/
-
-try {
-
-    $redis = new RedisClient([
-
-        'scheme'   => 'tls',
-
-        'host'     => 'model-satyr-125165.upstash.io',
-
-        'port'     => 6379,
-
-        'username' => 'default',
-
-        'password' => 'gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ'
-
-    ]);
-
-    $redis->connect();
-
-} catch (Exception $e) {
-
-    die(
-
-        json_encode([
-
-            "status"  => "error",
-
-            "message" => "Redis Connection Failed : " . $e->getMessage()
-
-        ])
-
-    );
-}
+// Redis (Upstash)
+$redis = new Predis\Client([
+    'scheme' => 'tls',
+    'host'   => 'model-satyr-125165.upstash.io',
+    'port'   => 6379,
+    'password' => 'gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ'
+]);
 
 ?>
-
-
-
-
-
-
-
