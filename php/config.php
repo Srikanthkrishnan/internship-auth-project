@@ -1,21 +1,83 @@
-<?php
+<!-- <?php
 
-header("Content-Type: application/json");
+require __DIR__ . '/../vendor/autoload.php';
 
-$host = getenv("MYSQLHOST");
-$user = getenv("MYSQLUSER");
-$pass = getenv("MYSQLPASSWORD");
-$db   = getenv("MYSQLDATABASE");
-$port = (int)getenv("MYSQLPORT");
+use MongoDB\Client as MongoClient;
+use Predis\Client as RedisClient;
 
-$conn = new mysqli($host, $user, $pass, $db, $port);
+/*
+|--------------------------------------------------------------------------
+| MySQL Connection
+|--------------------------------------------------------------------------
+*/
 
-if ($conn->connect_error) {
-    echo json_encode([
-        "status" => "error",
-        "message" => $conn->connect_error
-    ]);
-    exit;
+$mysql = new mysqli(
+    "127.0.0.1",
+    "root",
+    "",
+    "internship_auth",
+    3307
+);
+
+if ($mysql->connect_error) {
+
+    die(
+        "MySQL Connection Failed: "
+        . $mysql->connect_error
+    );
 }
 
-?>
+/*
+|--------------------------------------------------------------------------
+| MongoDB Connection
+|--------------------------------------------------------------------------
+*/
+
+try {
+
+    $mongoClient = new MongoClient(
+        "mongodb://127.0.0.1:27017"
+    );
+
+    $mongoDB = $mongoClient->internship_profile;
+
+} catch (Exception $e) {
+
+    die(
+        "MongoDB Connection Failed: "
+        . $e->getMessage()
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Redis Connection
+|--------------------------------------------------------------------------
+*/
+
+try {
+
+    $redis = new RedisClient([
+
+        "scheme" => "tcp",
+        "host"   => "127.0.0.1",
+        "port"   => 6379
+
+    ]);
+
+} catch (Exception $e) {
+
+    die(
+        "Redis Connection Failed: "
+        . $e->getMessage()
+    );
+}
+
+?> -->
+
+
+
+
+
+
+

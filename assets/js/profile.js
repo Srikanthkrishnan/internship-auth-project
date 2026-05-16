@@ -1,43 +1,97 @@
 $(document).ready(function () {
 
-    let user_id = localStorage.getItem('user_id');
+    /*
+    |--------------------------------------------------------------------------
+    | Check Login
+    |--------------------------------------------------------------------------
+    */
 
-    if (!user_id) {
-        window.location.href = 'login.html';
+    const token =
+        localStorage.getItem("session_token");
+
+    const user_id =
+        localStorage.getItem("user_id");
+
+    if (!token) {
+
+        window.location.href =
+            "login.html";
     }
 
-    $('#saveProfileBtn').click(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Save Profile
+    |--------------------------------------------------------------------------
+    */
+
+    $("#profileForm").submit(function (e) {
+
+        e.preventDefault();
+
+        let formData = $(this).serialize();
+
+        formData +=
+            "&user_id=" + user_id;
+
+        formData +=
+            "&token=" + token;
 
         $.ajax({
-            url: 'https://internship-auth-project.onrender.com/php/profile.php',
-            type: 'POST',
-            data: {
-                user_id: user_id,
-                age: $('#age').val(),
-                dob: $('#dob').val(),
-                contact: $('#contact').val()
-            },
+
+            url: "php/profile.php",
+
+            type: "POST",
+
+            data: formData,
+
             success: function (response) {
 
-                let data = JSON.parse(response);
-                alert(data.message);
-            }
-        });
-    });
+                console.log(response);
 
-    $('#logoutBtn').click(function () {
+                Swal.fire({
 
-        $.ajax({
-            url: 'https://internship-auth-project.onrender.com/php/logout.php',
-            type: 'POST',
-            data: {
-                token: localStorage.getItem('token')
+                    icon: 'success',
+
+                    title: 'Profile Saved',
+
+                    showConfirmButton: false,
+
+                    timer: 2000
+
+                });
+
             },
-            success: function () {
 
-                localStorage.clear();
-                window.location.href = 'https://internship-auth-project.onrender.com/login.html';
+            error: function (xhr) {
+
+                console.log(xhr.responseText);
+
+                Swal.fire({
+
+                    icon: 'error',
+
+                    title: 'Save Failed'
+
+                });
+
             }
+
         });
+
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout
+    |--------------------------------------------------------------------------
+    */
+
+    $("#logoutBtn").click(function () {
+
+        localStorage.clear();
+
+        window.location.href =
+            "login.html";
+    });
+
 });

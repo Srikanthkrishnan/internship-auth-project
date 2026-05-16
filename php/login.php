@@ -1,49 +1,45 @@
 <?php
 
-include 'config.php';
+$conn = new mysqli("127.0.0.1", "root", "", "internship_auth", 3307);
+
+if ($conn->connect_error) {
+    die(json_encode([
+        "status" => "error",
+        "message" => "Database Connection Failed"
+    ]));
+}
 
 $email = $_POST['email'];
 $password = $_POST['password'];
 
-$stmt = $mysql->prepare(
-    "SELECT id, password FROM users WHERE email = ?"
-);
-
-$stmt->bind_param("s", $email);
-$stmt->execute();
-
-$result = $stmt->get_result();
+$sql = "SELECT * FROM users WHERE email='$email'";
+$result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
 
     $user = $result->fetch_assoc();
 
+    // Verify hashed password
     if (password_verify($password, $user['password'])) {
 
-        $token = bin2hex(random_bytes(16));
-
-        // STORE SESSION IN REDIS
-        $redis->set($token, $user['id']);
-
         echo json_encode([
-            "status" => true,
-            "token" => $token,
-            "user_id" => $user['id']
+            "status" => "success",
+            "message" => "Login Successful"
         ]);
 
     } else {
 
         echo json_encode([
-            "status" => false,
-            "message" => "Invalid password"
+            "status" => "error",
+            "message" => "Invalid Password"
         ]);
     }
 
 } else {
 
     echo json_encode([
-        "status" => false,
-        "message" => "User not found"
+        "status" => "error",
+        "message" => "User Not Found"
     ]);
 }
 

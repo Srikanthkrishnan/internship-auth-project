@@ -1,45 +1,42 @@
+console.log("register.js loaded");
+
+//alert("JavaScript Connected");
+
 $(document).ready(function () {
 
+    //alert("jQuery Working");
+
     $("#registerForm").submit(function (e) {
+
         e.preventDefault();
 
-        let name = $("#name").val();
-        let email = $("#email").val();
-        let password = $("#password").val();
+        //alert("Form Submitted");
 
         $.ajax({
-            url: "php/register.php",
-            type: "POST",
-            dataType: "json",
 
-            data: {
-                name: name,
-                email: email,
-                password: password
-            },
+            url: "/internship-project/php/register.php",
+
+            type: "POST",
+
+            data: $(this).serialize(),
 
             success: function (response) {
 
                 console.log(response);
 
-                if (response.status === "success") {
+                alert(response);
 
-                    alert(response.message);
-
-                    window.location.href = "login.html";
-
-                } else {
-
-                    alert(response.message);
-                }
+                window.location.href =
+                    "/internship-project/login.html";
             },
 
-            error: function (xhr, status, error) {
+            error: function (xhr) {
 
                 console.log(xhr.responseText);
 
                 alert("AJAX Error");
             }
+
         });
 
     });

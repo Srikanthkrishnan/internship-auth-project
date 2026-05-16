@@ -1,39 +1,69 @@
-$(document).ready(function(){
+$(document).ready(function () {
 
-    $("#loginForm").submit(function(e){
+    $("#loginForm").submit(function (e) {
 
         e.preventDefault();
 
         $.ajax({
 
-            url: "assets/php/login.php",
+            url: "php/login.php",
 
             type: "POST",
 
+            dataType: "json",
+
             data: {
-
                 email: $("#email").val(),
-
                 password: $("#password").val()
+            },
+
+            success: function (data) {
+
+                console.log(data);
+
+                if (data.status === "success") {
+
+                    localStorage.setItem(
+                        "session_token",
+                        data.token
+                    );
+
+                    localStorage.setItem(
+                        "user_id",
+                        data.user_id
+                    );
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Login Successful",
+                        text: "Redirecting..."
+                    });
+
+                    setTimeout(() => {
+                        window.location.href = "profile.html";
+                    }, 1500);
+
+                } else {
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Login Failed",
+                        text: data.message
+                    });
+
+                }
 
             },
 
-            success: function(response){
+            error: function (xhr) {
 
-                let data = JSON.parse(response);
+                console.log(xhr.responseText);
 
-                alert(data.message);
-
-                if(data.status === "success"){
-
-                    localStorage.setItem(
-                        "user_email",
-                        $("#email").val()
-                    );
-
-                    window.location.href = "profile.html";
-
-                }
+                Swal.fire({
+                    icon: "error",
+                    title: "AJAX Error",
+                    text: "Check console"
+                });
 
             }
 

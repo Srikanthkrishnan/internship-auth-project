@@ -1,42 +1,92 @@
-<?php
+<!-- <?php
 
-header("Content-Type: application/json");
+include 'config.php';
 
-include "config.php";
+$username = $_POST['username'];
+$email = $_POST['email'];
 
-$name = $_POST['name'] ?? '';
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
-
-if (!$name || !$email || !$password) {
-
-    echo json_encode([
-        "status" => "error",
-        "message" => "All fields required"
-    ]);
-
-    exit;
-}
-
-$hashed = password_hash($password, PASSWORD_DEFAULT);
-
-$stmt = $conn->prepare(
-    "INSERT INTO users(name,email,password) VALUES(?,?,?)"
+$password = password_hash(
+    $_POST['password'],
+    PASSWORD_DEFAULT
 );
 
-$stmt->bind_param("sss", $name, $email, $hashed);
+$stmt = $mysql->prepare(
+    "INSERT INTO users(username,email,password)
+     VALUES(?,?,?)"
+);
+
+$stmt->bind_param(
+    "sss",
+    $username,
+    $email,
+    $password
+);
 
 if ($stmt->execute()) {
 
-    echo json_encode([
-        "status" => "success",
-        "message" => "Registered Successfully"
-    ]);
+    echo "Registration Successful";
 
 } else {
 
-    echo json_encode([
-        "status" => "error",
-        "message" => "Registration Failed"
-    ]);
+    echo "Registration Failed";
 }
+
+?> -->
+
+
+
+
+
+
+<?php
+
+include 'config.php';
+
+/*
+|--------------------------------------------------------------------------
+| Get Form Data
+|--------------------------------------------------------------------------
+*/
+
+$username = $_POST['username'];
+$email = $_POST['email'];
+
+$password = password_hash(
+    $_POST['password'],
+    PASSWORD_DEFAULT
+);
+
+/*
+|--------------------------------------------------------------------------
+| Insert User
+|--------------------------------------------------------------------------
+*/
+
+$stmt = $mysql->prepare(
+    "INSERT INTO users(username,email,password)
+     VALUES(?,?,?)"
+);
+
+$stmt->bind_param(
+    "sss",
+    $username,
+    $email,
+    $password
+);
+
+/*
+|--------------------------------------------------------------------------
+| Execute Query
+|--------------------------------------------------------------------------
+*/
+
+if ($stmt->execute()) {
+
+    echo "Registration Successful";
+
+} else {
+
+    echo "Registration Failed";
+}
+
+?>

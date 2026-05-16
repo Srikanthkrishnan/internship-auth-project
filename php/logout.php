@@ -2,13 +2,10 @@
 
 include 'config.php';
 
-$token = $_POST['token'];
+$token = $_GET['token'];
 
 $redis->del([$token]);
 
-
-echo json_encode([
-    "status" => true
-]);
+echo "Logged Out";
 
 ?>
