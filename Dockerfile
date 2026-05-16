@@ -1,22 +1,32 @@
 FROM php:8.2-apache
 
+# Install required packages
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
-    libzip-dev \
-    && docker-php-ext-install mysqli zip
+    libssl-dev \
+    pkg-config \
+    libcurl4-openssl-dev
 
-# Install MongoDB extension faster
-RUN pecl install mongodb-1.21.0 \
-    && docker-php-ext-enable mongodb
+# Install MongoDB extension
+RUN pecl install mongodb && docker-php-ext-enable mongodb
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install MySQL extension
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Enable Apache rewrite
+RUN a2enmod rewrite
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy project files
+COPY . /var/www/html/
 
 WORKDIR /var/www/html
 
-COPY . .
-
-RUN composer install --ignore-platform-reqs --no-dev
+# Install PHP dependencies
+RUN composer install
 
 EXPOSE 80
