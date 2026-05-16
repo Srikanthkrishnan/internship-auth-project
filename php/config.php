@@ -11,9 +11,11 @@ use Predis\Client as PredisClient;
 
 $mysql_host = "yamanote.proxy.rlwy.net";
 $mysql_port = 13373;
-$mysql_db   = "railway";
+$mysql_db   = "internship_auth";
 $mysql_user = "root";
 $mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
+
+
 
 $conn = new mysqli(
     $mysql_host,
@@ -33,21 +35,17 @@ if ($conn->connect_error) {
 /* =========================
    MONGODB CONNECTION
 ========================= */
-
-$mongo_uri = "mongodb+srv://ks8283311_db_user:Srikanth123@cluster0.5600sbj.mongodb.net/internship_profile?retryWrites=true&w=majority&appName=Cluster0";
-
 try {
 
-    $mongoClient = new Client($mongo_uri);
+    $mongo_uri = "mongodb+srv://srikanthkrishnan15_db_user:hpT87xGEEzR7zoIe@cluster0.p8n08ma.mongodb.net/?appName=Cluster0";
+
+    $mongoClient = new MongoDB\Client($mongo_uri);
 
     $mongoDB = $mongoClient->internship_profile;
 
 } catch (Exception $e) {
 
-    die(json_encode([
-        "status" => "error",
-        "message" => "MongoDB Connection Failed: " . $e->getMessage()
-    ]));
+    die("MongoDB Connection Failed: " . $e->getMessage());
 }
 
 /* =========================
