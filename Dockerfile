@@ -5,17 +5,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     zip \
     libzip-dev \
-    && docker-php-ext-install mysqli
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+    && docker-php-ext-install mysqli zip
 
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
-COPY . /var/www/html
+COPY . .
 
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 80
