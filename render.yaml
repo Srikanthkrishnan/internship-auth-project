@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: internship-auth-project
+    env: php
+    buildCommand: composer install
+    startCommand: php -S 0.0.0.0:$PORT
