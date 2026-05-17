@@ -1,13 +1,16 @@
 FROM php:8.2-apache
 
-# Install required system packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
     libssl-dev \
     pkg-config \
-    && docker-php-ext-install mysqli pdo pdo_mysql
+    libzip-dev
+
+# Install MySQL extensions
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip
 
 # Install MongoDB extension
 RUN pecl install mongodb \
@@ -23,10 +26,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy project files
-COPY . /var/www/html
+COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install composer packages
+RUN composer install --ignore-platform-req=ext-mongodb --no-dev --optimize-autoloader
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html
