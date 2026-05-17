@@ -8,7 +8,7 @@ use Predis\Client as RedisClient;
 
 // ================= MYSQL =================
 
-$mysql_host = "yamamote.proxy.rlwy.net";
+$mysql_host = "mysql.railway.internal";
 $mysql_port = 13373;
 $mysql_db   = "railway";
 $mysql_user = "root";
