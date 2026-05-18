@@ -2,56 +2,41 @@
 
 header("Content-Type: application/json");
 
-require_once "config.php";
+require 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+// Get JSON data
+$data = json_decode(file_get_contents("php://input"), true);
 
+// Validate input
+if (
+    !isset($data['email']) ||
+    !isset($data['password'])
+) {
     echo json_encode([
         "status" => "error",
-        "message" => "Invalid Request"
+        "message" => "All fields are required"
     ]);
-
     exit;
 }
 
-/* =========================
-   GET FORM DATA
-========================= */
+$email = trim($data['email']);
+$password = trim($data['password']);
 
-$email = trim($_POST["email"] ?? "");
-$password = trim($_POST["password"] ?? "");
-
-/* =========================
-   VALIDATION
-========================= */
-
+// Check empty fields
 if (empty($email) || empty($password)) {
 
     echo json_encode([
         "status" => "error",
-        "message" => "Email and Password required"
+        "message" => "Please fill all fields"
     ]);
 
     exit;
 }
 
-/* =========================
-   MYSQL LOGIN CHECK
-========================= */
+// Find user
+$query = "SELECT * FROM users WHERE email = ?";
 
-$sql = "SELECT * FROM users WHERE email = ?";
-
-$stmt = $conn->prepare($sql);
-
-if (!$stmt) {
-
-    echo json_encode([
-        "status" => "error",
-        "message" => "SQL Prepare Failed"
-    ]);
-
-    exit;
-}
+$stmt = $conn->prepare($query);
 
 $stmt->bind_param("s", $email);
 
@@ -59,82 +44,56 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-
-    $user = $result->fetch_assoc();
-
-    /* =========================
-       VERIFY PASSWORD
-    ========================= */
-
-    if (password_verify($password, $user["password"])) {
-
-        /* =========================
-           STORE LOGIN IN REDIS
-        ========================= */
-
-        try {
-
-            $redis->set(
-                "user_login_" . $user["id"],
-                json_encode([
-                    "id" => $user["id"],
-                    "username" => $user["username"],
-                    "email" => $user["email"],
-                    "login_time" => date("Y-m-d H:i:s")
-                ])
-            );
-
-        } catch (Exception $e) {
-            // Redis optional
-        }
-
-        /* =========================
-           STORE LOGIN LOG IN MONGODB
-        ========================= */
-
-        try {
-
-            $mongoDB->profiles->insertOne([
-                "user_id" => $user["id"],
-                "username" => $user["username"],
-                "email" => $user["email"],
-                "login_time" => date("Y-m-d H:i:s"),
-                "ip_address" => $_SERVER["REMOTE_ADDR"] ?? "unknown"
-            ]);
-
-        } catch (Exception $e) {
-            // MongoDB optional
-        }
-
-        echo json_encode([
-            "status" => "success",
-            "message" => "Login Successful",
-            "user" => [
-                "id" => $user["id"],
-                "username" => $user["username"],
-                "email" => $user["email"]
-            ]
-        ]);
-
-    } else {
-
-        echo json_encode([
-            "status" => "error",
-            "message" => "Invalid Password"
-        ]);
-    }
-
-} else {
+// User not found
+if ($result->num_rows === 0) {
 
     echo json_encode([
         "status" => "error",
         "message" => "User Not Found"
     ]);
+
+    exit;
 }
 
-$stmt->close();
+$user = $result->fetch_assoc();
 
-$conn->close();
+// Verify password
+if (!password_verify($password, $user['password'])) {
+
+    echo json_encode([
+        "status" => "error",
+        "message" => "Invalid Password"
+    ]);
+
+    exit;
+}
+
+// Create session token
+$sessionToken = bin2hex(random_bytes(16));
+
+// Store session in Redis
+$redis->set(
+    $sessionToken,
+    json_encode([
+        "id" => $user['id'],
+        "username" => $user['username'],
+        "email" => $user['email']
+    ])
+);
+
+// Store token for 1 hour
+$redis->expire($sessionToken, 3600);
+
+// Success response
+echo json_encode([
+    "status" => "success",
+    "message" => "Login Successful",
+    "token" => $sessionToken,
+    "user" => [
+        "id" => $user['id'],
+        "username" => $user['username'],
+        "email" => $user['email']
+    ]
+]);
 
 ?>

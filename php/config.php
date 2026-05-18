@@ -1,44 +1,35 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require '../vendor/autoload.php';
 
 use MongoDB\Client;
 use Predis\Client as RedisClient;
 
-/*
-|--------------------------------------------------------------------------
-| MYSQL CONNECTION (Railway Public Networking)
-|--------------------------------------------------------------------------
-*/
+/* ================= MYSQL ================= */
 
-$mysql_host = getenv('MYSQLHOST') ?: 'yamanote.proxy.rlwy.net';
-$mysql_port = getenv('MYSQLPORT') ?: 13373;
-$mysql_db   = getenv('MYSQLDATABASE') ?: 'railway';
-$mysql_user = getenv('MYSQLUSER') ?: 'root';
-$mysql_pass = getenv('MYSQLPASSWORD') ?: 'OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf';
+$mysql_host = "yamabiko.proxy.rlwy.net";
+$mysql_port = 13373;
+$mysql_db   = "railway";
+$mysql_user = "root";
+$mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
 
 $conn = new mysqli(
     $mysql_host,
     $mysql_user,
     $mysql_pass,
     $mysql_db,
-    (int)$mysql_port
+    $mysql_port
 );
 
 if ($conn->connect_error) {
-
     die("MySQL Connection Failed: " . $conn->connect_error);
 }
 
-/*
-|--------------------------------------------------------------------------
-| MONGODB CONNECTION
-|--------------------------------------------------------------------------
-*/
-
-$mongo_uri = getenv('MONGODB_URI') ?: 'mongodb+srv://srikanthkrishnan15_db_user:hpT87xGEEzR7zoIe@cluster0.p8n08ma.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+/* ================= MONGODB ================= */
 
 try {
+
+    $mongo_uri = "mongodb+srv://srikanthkrishnan15_db_user:hpT87xGEEzR7zoIe@cluster0.p8n08ma.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     $mongoClient = new Client($mongo_uri);
 
@@ -49,26 +40,13 @@ try {
     die("MongoDB Connection Failed: " . $e->getMessage());
 }
 
-/*
-|--------------------------------------------------------------------------
-| REDIS CONNECTION (Upstash Redis)
-|--------------------------------------------------------------------------
-*/
+/* ================= REDIS ================= */
 
-try {
-
-    $redis = new RedisClient([
-
-        'scheme'   => 'tcp',
-        'host'     => getenv('REDIS_HOST') ?: 'model-satyr-125165.upstash.io',
-        'port'     => getenv('REDIS_PORT') ?: 6379,
-        'password' => getenv('REDIS_PASSWORD') ?: 'gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ'
-
-    ]);
-
-} catch (Exception $e) {
-
-    die("Redis Connection Failed: " . $e->getMessage());
-}
+$redis = new RedisClient([
+    "scheme" => "tcp",
+    "host" => "YOUR_REDIS_HOST",
+    "port" => 6379,
+    "password" => "gQAAAAAAAejtAAIgcDIwMTAzNTU1NjY4ZmQ0ODhhYjJhODg2YWRiOTM1OTAxYQ"
+]);
 
 ?>

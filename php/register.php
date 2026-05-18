@@ -1,92 +1,90 @@
-<!-- <?php
-
-include 'config.php';
-
-$username = $_POST['username'];
-$email = $_POST['email'];
-
-$password = password_hash(
-    $_POST['password'],
-    PASSWORD_DEFAULT
-);
-
-$stmt = $mysql->prepare(
-    "INSERT INTO users(username,email,password)
-     VALUES(?,?,?)"
-);
-
-$stmt->bind_param(
-    "sss",
-    $username,
-    $email,
-    $password
-);
-
-if ($stmt->execute()) {
-
-    echo "Registration Successful";
-
-} else {
-
-    echo "Registration Failed";
-}
-
-?> -->
-
-
-
-
-
-
 <?php
 
-include 'config.php';
+header("Content-Type: application/json");
 
-/*
-|--------------------------------------------------------------------------
-| Get Form Data
-|--------------------------------------------------------------------------
-*/
+require 'config.php';
 
-$username = $_POST['username'];
-$email = $_POST['email'];
+// Get JSON data
+$data = json_decode(file_get_contents("php://input"), true);
 
-$password = password_hash(
-    $_POST['password'],
-    PASSWORD_DEFAULT
-);
+// Validate input
+if (
+    !isset($data['username']) ||
+    !isset($data['email']) ||
+    !isset($data['password'])
+) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "All fields are required"
+    ]);
+    exit;
+}
 
-/*
-|--------------------------------------------------------------------------
-| Insert User
-|--------------------------------------------------------------------------
-*/
+$username = trim($data['username']);
+$email = trim($data['email']);
+$password = trim($data['password']);
 
-$stmt = $mysql->prepare(
-    "INSERT INTO users(username,email,password)
-     VALUES(?,?,?)"
-);
+// Check empty fields
+if (empty($username) || empty($email) || empty($password)) {
 
-$stmt->bind_param(
+    echo json_encode([
+        "status" => "error",
+        "message" => "Please fill all fields"
+    ]);
+
+    exit;
+}
+
+// Check existing email
+$checkQuery = "SELECT id FROM users WHERE email = ?";
+
+$checkStmt = $conn->prepare($checkQuery);
+
+$checkStmt->bind_param("s", $email);
+
+$checkStmt->execute();
+
+$checkResult = $checkStmt->get_result();
+
+if ($checkResult->num_rows > 0) {
+
+    echo json_encode([
+        "status" => "error",
+        "message" => "Email already exists"
+    ]);
+
+    exit;
+}
+
+// Hash password
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+// Insert user
+$insertQuery = "INSERT INTO users(username, email, password)
+VALUES (?, ?, ?)";
+
+$insertStmt = $conn->prepare($insertQuery);
+
+$insertStmt->bind_param(
     "sss",
     $username,
     $email,
-    $password
+    $hashedPassword
 );
 
-/*
-|--------------------------------------------------------------------------
-| Execute Query
-|--------------------------------------------------------------------------
-*/
+if ($insertStmt->execute()) {
 
-if ($stmt->execute()) {
-
-    echo "Registration Successful";
+    echo json_encode([
+        "status" => "success",
+        "message" => "Registration Successful"
+    ]);
 
 } else {
 
-    echo "Registration Failed";
+    echo json_encode([
+        "status" => "error",
+        "message" => "Registration Failed"
+    ]);
 }
 
 ?>
