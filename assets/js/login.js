@@ -7,6 +7,9 @@ $(document).ready(function () {
         let email = $("#email").val().trim();
         let password = $("#password").val().trim();
 
+        console.log(email);
+        console.log(password);
+
         $.ajax({
 
             url: "php/login.php",
@@ -38,6 +41,7 @@ $(document).ready(function () {
                         );
 
                         window.location.href = "profile.html";
+
                     });
 
                 } else {
