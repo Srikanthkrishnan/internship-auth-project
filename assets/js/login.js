@@ -10,7 +10,10 @@ $(document).ready(function () {
         $.ajax({
 
             url: "php/login.php",
+
             type: "POST",
+
+            dataType: "json",
 
             data: {
                 email: email,
@@ -44,7 +47,9 @@ $(document).ready(function () {
                         title: "Login Failed",
                         text: response.message
                     });
+
                 }
+
             },
 
             error: function (xhr) {
@@ -53,10 +58,14 @@ $(document).ready(function () {
 
                 Swal.fire({
                     icon: "error",
-                    title: "AJAX Error",
-                    text: "Check console"
+                    title: "Server Error",
+                    text: "Something went wrong"
                 });
+
             }
+
         });
+
     });
+
 });
