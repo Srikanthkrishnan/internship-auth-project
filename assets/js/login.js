@@ -4,55 +4,47 @@ $(document).ready(function () {
 
         e.preventDefault();
 
+        let email = $("#email").val().trim();
+        let password = $("#password").val().trim();
+
         $.ajax({
 
             url: "php/login.php",
-
             type: "POST",
 
-            dataType: "json",
-
             data: {
-                email: $("#email").val(),
-                password: $("#password").val()
+                email: email,
+                password: password
             },
 
-            success: function (data) {
+            success: function (response) {
 
-                console.log(data);
+                console.log(response);
 
-                if (data.status === "success") {
-
-                    localStorage.setItem(
-                        "session_token",
-                        data.token
-                    );
-
-                    localStorage.setItem(
-                        "user_id",
-                        data.user_id
-                    );
+                if (response.status === "success") {
 
                     Swal.fire({
                         icon: "success",
-                        title: "Login Successful",
-                        text: "Redirecting..."
-                    });
+                        title: "Login Success",
+                        text: response.message
+                    }).then(() => {
 
-                    setTimeout(() => {
+                        localStorage.setItem(
+                            "session_token",
+                            response.token
+                        );
+
                         window.location.href = "profile.html";
-                    }, 1500);
+                    });
 
                 } else {
 
                     Swal.fire({
                         icon: "error",
                         title: "Login Failed",
-                        text: data.message
+                        text: response.message
                     });
-
                 }
-
             },
 
             error: function (xhr) {
@@ -64,11 +56,7 @@ $(document).ready(function () {
                     title: "AJAX Error",
                     text: "Check console"
                 });
-
             }
-
         });
-
     });
-
 });
