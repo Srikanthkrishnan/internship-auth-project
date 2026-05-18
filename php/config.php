@@ -7,15 +7,21 @@ use Predis\Client as RedisClient;
 
 // ================= MYSQL =================
 
-// PUBLIC Railway MySQL Credentials
 $mysql_host = "yamabiko.proxy.rlwy.net";
 $mysql_port = 13373;
 $mysql_db   = "railway";
 $mysql_user = "root";
-$mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf";
+$mysql_pass = "OZRrSkuwUDeYIDgohPfxmiXcSDwKtGuf
+";
 
-// Create MySQL connection
-$conn = new mysqli(
+// Create connection
+$conn = mysqli_init();
+
+// IMPORTANT FIX
+mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
+
+// Connect
+$conn->real_connect(
     $mysql_host,
     $mysql_user,
     $mysql_pass,
@@ -24,7 +30,7 @@ $conn = new mysqli(
 );
 
 // Check connection
-if ($conn->connect_error) {
+if ($conn->connect_errno) {
     die("MySQL Connection Failed: " . $conn->connect_error);
 }
 
