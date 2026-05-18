@@ -2,41 +2,34 @@
 
 header("Content-Type: application/json");
 
-require 'config.php';
+require "config.php";
 
-// Get JSON data
-$data = json_decode(file_get_contents("php://input"), true);
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
-// Validate input
-if (
-    !isset($data['email']) ||
-    !isset($data['password'])
-) {
     echo json_encode([
         "status" => "error",
-        "message" => "All fields are required"
+        "message" => "Invalid Request"
     ]);
+
     exit;
 }
 
-$email = trim($data['email']);
-$password = trim($data['password']);
+$email = trim($_POST["email"] ?? "");
+$password = trim($_POST["password"] ?? "");
 
-// Check empty fields
 if (empty($email) || empty($password)) {
 
     echo json_encode([
         "status" => "error",
-        "message" => "Please fill all fields"
+        "message" => "All fields are required"
     ]);
 
     exit;
 }
 
-// Find user
-$query = "SELECT * FROM users WHERE email = ?";
+$sql = "SELECT * FROM users WHERE email = ?";
 
-$stmt = $conn->prepare($query);
+$stmt = $conn->prepare($sql);
 
 $stmt->bind_param("s", $email);
 
@@ -44,7 +37,6 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-// User not found
 if ($result->num_rows === 0) {
 
     echo json_encode([
@@ -57,8 +49,7 @@ if ($result->num_rows === 0) {
 
 $user = $result->fetch_assoc();
 
-// Verify password
-if (!password_verify($password, $user['password'])) {
+if (!password_verify($password, $user["password"])) {
 
     echo json_encode([
         "status" => "error",
@@ -68,32 +59,13 @@ if (!password_verify($password, $user['password'])) {
     exit;
 }
 
-// Create session token
-$sessionToken = bin2hex(random_bytes(16));
+$token = bin2hex(random_bytes(16));
 
-// Store session in Redis
-$redis->set(
-    $sessionToken,
-    json_encode([
-        "id" => $user['id'],
-        "username" => $user['username'],
-        "email" => $user['email']
-    ])
-);
-
-// Store token for 1 hour
-$redis->expire($sessionToken, 3600);
-
-// Success response
 echo json_encode([
     "status" => "success",
     "message" => "Login Successful",
-    "token" => $sessionToken,
-    "user" => [
-        "id" => $user['id'],
-        "username" => $user['username'],
-        "email" => $user['email']
-    ]
+    "token" => $token,
+    "username" => $user["username"]
 ]);
 
 ?>
