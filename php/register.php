@@ -2,51 +2,33 @@
 
 header("Content-Type: application/json");
 
-require 'config.php';
+require "config.php";
 
-// Get JSON data
-$data = json_decode(file_get_contents("php://input"), true);
+$username = trim($_POST["username"] ?? "");
+$email = trim($_POST["email"] ?? "");
+$password = trim($_POST["password"] ?? "");
 
-// Validate input
-if (
-    !isset($data['username']) ||
-    !isset($data['email']) ||
-    !isset($data['password'])
-) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "All fields are required"
-    ]);
-    exit;
-}
-
-$username = trim($data['username']);
-$email = trim($data['email']);
-$password = trim($data['password']);
-
-// Check empty fields
 if (empty($username) || empty($email) || empty($password)) {
 
     echo json_encode([
         "status" => "error",
-        "message" => "Please fill all fields"
+        "message" => "All fields are required"
     ]);
 
     exit;
 }
 
-// Check existing email
-$checkQuery = "SELECT id FROM users WHERE email = ?";
+$check = $conn->prepare(
+    "SELECT id FROM users WHERE email = ?"
+);
 
-$checkStmt = $conn->prepare($checkQuery);
+$check->bind_param("s", $email);
 
-$checkStmt->bind_param("s", $email);
+$check->execute();
 
-$checkStmt->execute();
+$result = $check->get_result();
 
-$checkResult = $checkStmt->get_result();
-
-if ($checkResult->num_rows > 0) {
+if ($result->num_rows > 0) {
 
     echo json_encode([
         "status" => "error",
@@ -56,23 +38,25 @@ if ($checkResult->num_rows > 0) {
     exit;
 }
 
-// Hash password
-$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+$hashedPassword = password_hash(
+    $password,
+    PASSWORD_DEFAULT
+);
 
-// Insert user
-$insertQuery = "INSERT INTO users(username, email, password)
+$sql = "INSERT INTO users
+(username, email, password)
 VALUES (?, ?, ?)";
 
-$insertStmt = $conn->prepare($insertQuery);
+$stmt = $conn->prepare($sql);
 
-$insertStmt->bind_param(
+$stmt->bind_param(
     "sss",
     $username,
     $email,
     $hashedPassword
 );
 
-if ($insertStmt->execute()) {
+if ($stmt->execute()) {
 
     echo json_encode([
         "status" => "success",
@@ -85,6 +69,7 @@ if ($insertStmt->execute()) {
         "status" => "error",
         "message" => "Registration Failed"
     ]);
+
 }
 
 ?>
